@@ -10,7 +10,26 @@ const TransactionList = ({ transactions, setTransactions }) => {
       category: '',
       amount: '',
     });
-    // Handle form input changes and update the 'formData' state accordingly
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortKey, setSortKey] = useState(null);
+
+    // Filter transactions based on the search term using Array.filter()
+  const filteredTransactions = transactions.filter((transaction) =>
+  transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+ // Sort transactions based on the 'sortKey' using Array.sort()
+ const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    if (sortKey === 'category') {
+      return a.category.localeCompare(b.category);
+    } else if (sortKey === 'description') {
+      return a.description.localeCompare(b.description);
+    } else {
+      return 0;
+    }
+  });
+
+   // Handle form input changes and update the 'formData' state accordingly
    const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -38,18 +57,8 @@ const TransactionList = ({ transactions, setTransactions }) => {
       category: formData.category,
       amount: parseFloat(formData.amount),
     };
-    // Generate a new unique id for the new transaction (you can use a library like uuid for this)
-    const newId = transactions.length + 1;
 
-    // Create the new transaction object using form data and convert amount to a number
-    const newTransaction = {
-      id: newId,
-      date: formData.date,
-      description: formData.description,
-      category: formData.category,
-      amount: parseFloat(formData.amount),
-    };
-// Add the new transaction to the 'transactions' state array using 'setTransactions'
+     // Add the new transaction to the 'transactions' state array using 'setTransactions'
      setTransactions([...transactions, newTransaction]);
 
      // Clear the form data after submission
@@ -65,6 +74,7 @@ const TransactionList = ({ transactions, setTransactions }) => {
   const handleSort = (key) => {
     setSortKey(key);
   };
+
   // Handle deletion of a transaction by filtering out the deleted transaction using 'setTransactions'
   const handleDelete = (id) => {
     setTransactions((prevTransactions) =>
@@ -79,26 +89,26 @@ const TransactionList = ({ transactions, setTransactions }) => {
       {/* Form to add a new transaction */}
       <form onSubmit={handleSubmit}>
         <input
-        type="text"
-        name="date"
-        placeholder="Date"
-        value={formData.date}
-        onChange={handleInputChange}
-      />
-      <input
-        type="text"
-        name="description"
-        placeholder="Description"
-        value={formData.description}
-        onChange={handleInputChange}
-      />
-      <input
-        type="text"
-        name="category"
-        placeholder="Category"
-        value={formData.category}
-        onChange={handleInputChange}
-            />
+          type="text"
+          name="date"
+          placeholder="Date"
+          value={formData.date}
+          onChange={handleInputChange}
+        />
+        <input
+          type="text"
+          name="description"
+          placeholder="Description"
+          value={formData.description}
+          onChange={handleInputChange}
+        />
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={formData.category}
+          onChange={handleInputChange}
+        />
         <input
           type="number"
           name="amount"
@@ -114,7 +124,7 @@ const TransactionList = ({ transactions, setTransactions }) => {
           value={searchTerm}
           onChange={handleSearch}
         />
-        </form>
+      </form>
       {/* Buttons to sort transactions */}
       <div className="sort-buttons">
         <button onClick={() => handleSort('category')}>Sort by Category</button>
@@ -127,7 +137,7 @@ const TransactionList = ({ transactions, setTransactions }) => {
             key={transaction.id}
             transaction={transaction}
             onDelete={handleDelete}
-            />
+          />
         ))}
       </ul>
     </div>
